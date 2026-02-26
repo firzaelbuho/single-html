@@ -6,10 +6,7 @@
 <title>Text Alay Converter</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-        font-family: 'Segoe UI', sans-serif;
-    }
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
     body {
         margin: 0;
@@ -31,29 +28,21 @@
         margin-bottom: 15px;
     }
 
-    select {
+    select, textarea {
         width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border-radius: 8px;
         background: #1c1c1c;
         color: white;
         border: none;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 15px;
+        font-size: 15px;
         outline: none;
     }
 
     textarea {
-        width: 100%;
         height: 120px;
-        padding: 15px;
-        border-radius: 12px;
-        border: none;
         resize: none;
-        font-size: 16px;
-        margin-bottom: 15px;
-        outline: none;
-        background: #1c1c1c;
-        color: #fff;
     }
 
     .output-container {
@@ -64,18 +53,17 @@
         position: absolute;
         right: 10px;
         bottom: 10px;
-        padding: 8px 14px;
+        padding: 7px 12px;
         border: none;
         border-radius: 8px;
         cursor: pointer;
         background: #6c5ce7;
         color: white;
-        font-size: 14px;
+        font-size: 13px;
     }
 
     footer {
         text-align: center;
-        margin-top: 10px;
         font-size: 12px;
         color: #666;
     }
@@ -84,163 +72,128 @@
 <body>
 
 <div class="container">
+
     <h1>Text Alay Converter</h1>
 
-    <select id="modeSelect">
-        <option value="normal">Mode Normal (0-9 only)</option>
-        <option value="extreme">Mode Extreme (Symbols + Case)</option>
+    <select id="mode">
+        <option value="normal">Mode Normal (0-9)</option>
+        <option value="extreme">Mode Extreme (Symbol Visual)</option>
+        <option value="brutal">Mode Brutal (ASCII Hardcore)</option>
     </select>
 
-    <textarea id="inputText" placeholder="Ketik sesuatu..."></textarea>
+    <textarea id="input" placeholder="Ketik sesuatu..."></textarea>
 
     <div class="output-container">
-        <textarea id="outputText" placeholder="Hasil muncul di sini..." readonly></textarea>
+        <textarea id="output" readonly placeholder="Hasil muncul di sini..."></textarea>
         <button onclick="copyText()">Copy</button>
     </div>
 
-    <footer>2 Mode System</footer>
+    <footer>made by @langitbiru_tw</footer>
+
 </div>
 
 <script>
 
-/* ==========================
-   MODE NORMAL (0-9 only)
-========================== */
+/* =========================
+   MODE 1: NORMAL (0-9 ONLY)
+========================= */
 
 const normalMap = {
-    a: "4",
-    b: "8",
-    e: "3",
-    g: "6",
-    i: "1",
-    l: "1",
-    o: "0",
-    s: "5",
-    t: "7",
-    z: "2"
+    a: "4", b: "8", e: "3", g: "6",
+    i: "1", l: "1", o: "0",
+    s: "5", t: "7", z: "2"
 };
 
-/* ==========================
-   MODE EXTREME (case sensitive)
-========================== */
+
+/* =========================
+   MODE 2: EXTREME (Readable Symbol)
+========================= */
 
 const extremeMap = {
 
-    // A / a
-    A: "4",
-    a: "@",
-
-    B: "8",
-    b: "ß",
-
-    C: "(",
-    c: "<",
-
-    D: "|)",
-    d: "cl",
-
-    E: "3",
-    e: "€",
-
-    F: "ƒ",
-    f: "ƒ",
-
-    G: "6",
-    g: "9",
-
-    H: "#",
-    h: "|-|",
-
-    I: "1",
-    i: "!",
-
-    J: "_|",
-    j: "_/",
-
-    K: "|<",
-    k: "|{",
-
-    L: "1",
-    l: "|",
-
-    M: "/\\/\\",
-    m: "/v\\",
-
-    N: "|\\|",
-    n: "/\\/",
-
-    O: "0",
-    o: "()",
-
-    P: "|°",
-    p: "|>",
-
-    Q: "0_",
-    q: "(,)",
-
-    R: "®",
-    r: "|2",
-
-    S: "5",
-    s: "$",
-
-    T: "7",
-    t: "+",
-
-    U: "(_)",
-    u: "v",
-
-    V: "\\/",
-    v: "\\/",
-
-    W: "\\/\\/",
-    w: "vv",
-
-    X: "><",
-    x: "}{",
-
-    Y: "¥",
-    y: "`/",
-
-    Z: "2",
-    z: "≥"
+    A: "4", a: "@",
+    B: "8", b: "ß",
+    E: "3", e: "€",
+    G: "6", g: "9",
+    I: "1", i: "!",
+    L: "1", l: "|",
+    O: "0", o: "()",
+    S: "5", s: "$",
+    T: "7", t: "+",
+    Y: "¥", y: "¥",
+    C: "(", c: "("
 };
 
-/* ==========================
-   CONVERTER
-========================== */
+
+/* =========================
+   MODE 3: BRUTAL (ASCII HARDCORE)
+========================= */
+
+const brutalMap = {
+
+    A: "4", a: "@",
+    B: "|3", b: "ß",
+    C: "<", c: "(",
+    D: "|)", d: "|>",
+    E: "3", e: "€",
+    F: "ƒ", f: "ƒ",
+    G: "6", g: "9",
+    H: "#", h: "|-|",
+    I: "1", i: "!",
+    J: "_|", j: "_/",
+    K: "|<", k: "|{",
+    L: "1", l: "|",
+    M: "/\\/\\", m: "/v\\",
+    N: "|\\|", n: "/\\/",
+    O: "0", o: "()",
+    P: "|°", p: "|>",
+    Q: "0_", q: "(,)",
+    R: "®", r: "|2",
+    S: "5", s: "$",
+    T: "7", t: "+",
+    U: "(_)", u: "v",
+    V: "\\/", v: "\\/",
+    W: "\\/\\/", w: "vv",
+    X: "><", x: "}{",
+    Y: "¥", y: "`/",
+    Z: "2", z: "≥"
+};
+
+
+/* =========================
+   CONVERTER CORE
+========================= */
 
 function convert(text) {
 
-    const mode = document.getElementById("modeSelect").value;
+    const mode = document.getElementById("mode").value;
 
     return text.split('').map(char => {
 
         if (mode === "normal") {
             const lower = char.toLowerCase();
-            if (normalMap[lower]) {
-                return normalMap[lower];
-            }
-            return char;
+            return normalMap[lower] || char;
         }
 
         if (mode === "extreme") {
-            if (extremeMap[char]) {
-                return extremeMap[char];
-            }
-            return char;
+            return extremeMap[char] || char;
+        }
+
+        if (mode === "brutal") {
+            return brutalMap[char] || char;
         }
 
     }).join('');
 }
 
-/* ==========================
-   EVENTS
-========================== */
 
-const input = document.getElementById("inputText");
-const modeSelect = document.getElementById("modeSelect");
-const output = document.getElementById("outputText");
+/* =========================
+   EVENTS
+========================= */
+
+const input = document.getElementById("input");
+const output = document.getElementById("output");
+const modeSelect = document.getElementById("mode");
 
 function update() {
     output.value = convert(input.value);
