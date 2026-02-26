@@ -64,11 +64,44 @@
         font-size: 13px;
     }
 
+    button:hover {
+        opacity: 0.9;
+    }
+
     footer {
         text-align: center;
         font-size: 12px;
         color: #666;
+        margin-top: 10px;
     }
+
+    /* ===== Improved Disclaimer UI ===== */
+    .disclaimer {
+        margin-top: 20px;
+        padding: 14px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1a1a1a, #141414);
+        border: 1px solid #2a2a2a;
+        font-size: 12px;
+        line-height: 1.6;
+        color: #aaa;
+    }
+
+    .disclaimer strong {
+        color: #ff7675;
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+
+    .disclaimer small {
+        display: block;
+        margin-top: 8px;
+        color: #666;
+        font-size: 11px;
+    }
+
 </style>
 </head>
 <body>
@@ -92,6 +125,16 @@
 
     <footer>made just for fun ✌️</footer>
 
+    <!-- Improved Disclaimer -->
+    <div class="disclaimer">
+        <strong>⚠ Informasi</strong>
+        Mohon maaf jika iklan yang muncul terasa mengganggu, silakan abaikan atau tutup tab tersebut.
+
+        <small>
+            STOP JUDI ONLINE !!!.
+        </small>
+    </div>
+
 </div>
 
 <script>
@@ -106,13 +149,11 @@ const normalMap = {
     s: "5", t: "7", z: "2"
 };
 
-
 /* =========================
-   MODE 2: EXTREME (Readable Symbol)
+   MODE 2: EXTREME
 ========================= */
 
 const extremeMap = {
-
     A: "4", a: "@",
     B: "8", b: "ß",
     E: "3", e: "€",
@@ -126,13 +167,11 @@ const extremeMap = {
     C: "(", c: "("
 };
 
-
 /* =========================
-   MODE 3: BRUTAL (ASCII HARDCORE)
+   MODE 3: BRUTAL
 ========================= */
 
 const brutalMap = {
-
     A: "4", a: "@",
     B: "|3", b: "ß",
     C: "<", c: "(",
@@ -161,7 +200,6 @@ const brutalMap = {
     Z: "2", z: "≥"
 };
 
-
 /* =========================
    CONVERTER CORE
 ========================= */
@@ -187,7 +225,6 @@ function convert(text) {
 
     }).join('');
 }
-
 
 /* =========================
    EVENTS
