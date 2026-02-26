@@ -97,40 +97,56 @@
 </div>
 
 <script>
+
+// Mapping huruf
 const alayMap = {
-    a: ["4", "@", "a"],
-    b: ["8", "b"],
-    e: ["3", "e"],
+    a: ["4", "@"],
+    b: ["8"],
+    e: ["3"],
     g: ["6", "9"],
-    i: ["1", "!", "i"],
-    l: ["1", "l"],
-    o: ["0", "o"],
+    i: ["1", "!"],
+    l: ["1"],
+    o: ["0"],
     s: ["5", "$"],
     t: ["7", "+"],
-    z: ["2", "z"]
+    z: ["2"]
 };
+
+// Cache supaya konsisten selama sesi
+const alayCache = {};
+
+function getRandomVariant(letter) {
+    if (!alayCache[letter]) {
+        const variants = alayMap[letter];
+        alayCache[letter] = variants[Math.floor(Math.random() * variants.length)];
+    }
+    return alayCache[letter];
+}
 
 function convertToAlay(text) {
     return text.split('').map(char => {
         const lower = char.toLowerCase();
+
         if (alayMap[lower]) {
-            const randomChar = alayMap[lower][Math.floor(Math.random() * alayMap[lower].length)];
-            return char === lower ? randomChar : randomChar.toUpperCase();
+            const mapped = getRandomVariant(lower);
+            return char === lower ? mapped : mapped.toUpperCase();
         }
+
         return char;
     }).join('');
 }
 
+// Real-time convert
 document.getElementById("inputText").addEventListener("input", function() {
     document.getElementById("outputText").value = convertToAlay(this.value);
 });
 
+// Modern clipboard API
 function copyText() {
-    const output = document.getElementById("outputText");
-    output.select();
-    document.execCommand("copy");
-    alert("Text berhasil di-copy!");
+    const output = document.getElementById("outputText").value;
+    navigator.clipboard.writeText(output);
 }
+
 </script>
 
 </body>
