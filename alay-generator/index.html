@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Text Alay 2010 Converter</title>
+<title>Text Alay Converter</title>
 
 <style>
     * {
@@ -28,9 +28,18 @@
 
     h1 {
         text-align: center;
-        font-weight: 600;
-        margin-bottom: 20px;
-        letter-spacing: 1px;
+        margin-bottom: 15px;
+    }
+
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        background: #1c1c1c;
+        color: white;
+        border: none;
+        outline: none;
     }
 
     textarea {
@@ -45,10 +54,6 @@
         outline: none;
         background: #1c1c1c;
         color: #fff;
-    }
-
-    textarea::placeholder {
-        color: #888;
     }
 
     .output-container {
@@ -66,16 +71,11 @@
         background: #6c5ce7;
         color: white;
         font-size: 14px;
-        transition: 0.3s;
-    }
-
-    button:hover {
-        background: #a29bfe;
     }
 
     footer {
         text-align: center;
-        margin-top: 15px;
+        margin-top: 10px;
         font-size: 12px;
         color: #666;
     }
@@ -84,67 +84,173 @@
 <body>
 
 <div class="container">
-    <h1>✨ Text Alay Converter</h1>
+    <h1>Text Alay Converter</h1>
+
+    <select id="modeSelect">
+        <option value="normal">Mode Normal (0-9 only)</option>
+        <option value="extreme">Mode Extreme (Symbols + Case)</option>
+    </select>
 
     <textarea id="inputText" placeholder="Ketik sesuatu..."></textarea>
 
     <div class="output-container">
-        <textarea id="outputText" placeholder="Hasil alay muncul di sini..." readonly></textarea>
+        <textarea id="outputText" placeholder="Hasil muncul di sini..." readonly></textarea>
         <button onclick="copyText()">Copy</button>
     </div>
 
-    <footer>made by @langitbiru_tw</footer>
+    <footer>2 Mode System</footer>
 </div>
 
 <script>
 
-// Mapping huruf
-const alayMap = {
-    a: ["4", "@"],
-    b: ["8"],
-    e: ["3"],
-    g: ["6", "9"],
-    i: ["1", "!"],
-    l: ["1"],
-    o: ["0"],
-    s: ["5", "$"],
-    t: ["7", "+"],
-    z: ["2"]
+/* ==========================
+   MODE NORMAL (0-9 only)
+========================== */
+
+const normalMap = {
+    a: "4",
+    b: "8",
+    e: "3",
+    g: "6",
+    i: "1",
+    l: "1",
+    o: "0",
+    s: "5",
+    t: "7",
+    z: "2"
 };
 
-// Cache supaya konsisten selama sesi
-const alayCache = {};
+/* ==========================
+   MODE EXTREME (case sensitive)
+========================== */
 
-function getRandomVariant(letter) {
-    if (!alayCache[letter]) {
-        const variants = alayMap[letter];
-        alayCache[letter] = variants[Math.floor(Math.random() * variants.length)];
-    }
-    return alayCache[letter];
-}
+const extremeMap = {
 
-function convertToAlay(text) {
+    // A / a
+    A: "4",
+    a: "@",
+
+    B: "8",
+    b: "ß",
+
+    C: "(",
+    c: "<",
+
+    D: "|)",
+    d: "cl",
+
+    E: "3",
+    e: "€",
+
+    F: "ƒ",
+    f: "ƒ",
+
+    G: "6",
+    g: "9",
+
+    H: "#",
+    h: "|-|",
+
+    I: "1",
+    i: "!",
+
+    J: "_|",
+    j: "_/",
+
+    K: "|<",
+    k: "|{",
+
+    L: "1",
+    l: "|",
+
+    M: "/\\/\\",
+    m: "/v\\",
+
+    N: "|\\|",
+    n: "/\\/",
+
+    O: "0",
+    o: "()",
+
+    P: "|°",
+    p: "|>",
+
+    Q: "0_",
+    q: "(,)",
+
+    R: "®",
+    r: "|2",
+
+    S: "5",
+    s: "$",
+
+    T: "7",
+    t: "+",
+
+    U: "(_)",
+    u: "v",
+
+    V: "\\/",
+    v: "\\/",
+
+    W: "\\/\\/",
+    w: "vv",
+
+    X: "><",
+    x: "}{",
+
+    Y: "¥",
+    y: "`/",
+
+    Z: "2",
+    z: "≥"
+};
+
+/* ==========================
+   CONVERTER
+========================== */
+
+function convert(text) {
+
+    const mode = document.getElementById("modeSelect").value;
+
     return text.split('').map(char => {
-        const lower = char.toLowerCase();
 
-        if (alayMap[lower]) {
-            const mapped = getRandomVariant(lower);
-            return char === lower ? mapped : mapped.toUpperCase();
+        if (mode === "normal") {
+            const lower = char.toLowerCase();
+            if (normalMap[lower]) {
+                return normalMap[lower];
+            }
+            return char;
         }
 
-        return char;
+        if (mode === "extreme") {
+            if (extremeMap[char]) {
+                return extremeMap[char];
+            }
+            return char;
+        }
+
     }).join('');
 }
 
-// Real-time convert
-document.getElementById("inputText").addEventListener("input", function() {
-    document.getElementById("outputText").value = convertToAlay(this.value);
-});
+/* ==========================
+   EVENTS
+========================== */
 
-// Modern clipboard API
+const input = document.getElementById("inputText");
+const modeSelect = document.getElementById("modeSelect");
+const output = document.getElementById("outputText");
+
+function update() {
+    output.value = convert(input.value);
+}
+
+input.addEventListener("input", update);
+modeSelect.addEventListener("change", update);
+
 function copyText() {
-    const output = document.getElementById("outputText").value;
-    navigator.clipboard.writeText(output);
+    navigator.clipboard.writeText(output.value);
 }
 
 </script>
