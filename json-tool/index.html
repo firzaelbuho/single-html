@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Tool</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <header>
+    <h1>JSON Tool</h1>
+    <p>Simplify large JSON payloads by reducing repetitive arrays</p>
+  </header>
+
+  <main class="container">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Input JSON</h2>
+        <button id="formatBtn" class="btn secondary">Format</button>
+      </div>
+      <textarea id="jsonInput" placeholder="Paste your massive JSON here..."></textarea>
+    </div>
+
+    <div class="panel actions">
+      <button id="simplifyBtn" class="btn primary">Simplify &rarr;</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Simplified Output</h2>
+        <button id="copyBtn" class="btn secondary">Copy</button>
+      </div>
+      <textarea id="jsonOutput" readonly placeholder="Simplified structure will appear here..."></textarea>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

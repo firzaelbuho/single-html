@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JKT48 MnG & 2Shoot Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { jktred: '#E4223A' }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
+    <div class="max-w-[1200px] mx-auto p-4 sm:p-8 flex flex-col gap-8">
+        <!-- Header -->
+        <header class="flex flex-col gap-6 border-b border-slate-700/50 pb-6 mt-4">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white mb-1"><span class="text-jktred">JKT48</span> Tracker</h1>
+                <p class="text-slate-400 text-sm">Monitoring Status Kuota Meet & Greet dan 2Shot</p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                <div class="flex bg-slate-800 p-1 rounded-lg w-full sm:w-auto">
+                    <button id="btn-2shoot" class="flex-1 px-4 py-2 text-sm font-medium rounded-md bg-jktred text-white transition shadow-sm">2Shoot</button>
+                    <button id="btn-mng" class="flex-1 px-4 py-2 text-sm font-medium rounded-md text-slate-400 hover:text-white hover:bg-slate-700/50 transition">M&G</button>
+                </div>
+                
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <div class="relative flex-1 sm:w-64">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="search-input" placeholder="Cari member / oshi..." autocomplete="off" 
+                            class="w-full bg-slate-800 border border-slate-700 text-white pl-9 pr-4 py-2 rounded-lg text-sm focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 transition">
+                    </div>
+                    
+                    <select id="sort-select" class="bg-slate-800 border border-slate-700 text-slate-300 py-2 px-3 rounded-lg text-sm focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 transition cursor-pointer">
+                        <option value="sold-desc">Terlaris (Tinggi ke Rendah)</option>
+                        <option value="sold-asc">Tiket (Rendah ke Tinggi)</option>
+                        <option value="name-asc">Nama (A-Z)</option>
+                        <option value="name-desc">Nama (Z-A)</option>
+                    </select>
+
+                    <button id="btn-refresh" class="bg-slate-800 border border-slate-700 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition" title="Refresh Data">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex flex-col gap-6">
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50 flex flex-col gap-1 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Tiket Terjual</span>
+                    <span class="text-3xl font-bold text-white" id="stat-sold">-</span>
+                </div>
+                <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50 flex flex-col gap-1 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Total Sesi</span>
+                    <span class="text-3xl font-bold text-white" id="stat-sessions">-</span>
+                </div>
+                <div class="bg-slate-800/50 p-5 rounded-xl border-b-4 border-jktred border-t border-l border-r border-slate-700/50 flex flex-col gap-1 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest text-jktred">Sesi Sold Out</span>
+                    <span class="text-3xl font-bold text-white" id="stat-soldout">-</span>
+                </div>
+            </div>
+
+            <!-- States -->
+            <div id="loading" class="flex flex-col items-center justify-center py-20 gap-4 bg-slate-800/20 rounded-xl border border-slate-700/30">
+                <div class="w-8 h-8 rounded-full border-4 border-slate-600 border-t-jktred animate-spin"></div>
+                <p class="text-slate-400 font-medium text-sm">Menarik data dari JKT48...</p>
+            </div>
+
+            <div id="error" class="hidden flex-col items-center justify-center py-20 gap-4 bg-red-900/10 rounded-xl border border-red-900/30">
+                <svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <p id="error-message" class="text-slate-300 font-medium">Gagal mengambil data.</p>
+                <button id="btn-retry" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition border border-slate-600">Coba Lagi</button>
+            </div>
+
+            <div id="empty-state" class="hidden flex-col items-center justify-center py-20 gap-4 bg-slate-800/20 rounded-xl border border-slate-700/30">
+                <p class="text-slate-400 font-medium text-lg">Hiks, Member tidak ditemukan.</p>
+            </div>
+
+            <!-- Grid -->
+            <div id="members-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Injected via JS -->
+            </div>
+        </main>
+        
+        <footer class="text-center py-6 border-t border-slate-800/50 text-slate-500 text-xs mt-4">
+            <p>Developed based on public JKT48 APIs. Unofficial tracker.</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
