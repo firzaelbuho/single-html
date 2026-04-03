@@ -86,21 +86,18 @@ async function loadData(eventName) {
     statSoldout.textContent = '-';
     
     try {
-        const rawUrl = APIs[eventName];
-        const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(rawUrl);
+        // Gunakan Vercel Serverless Function sebagai proxy 
+        // Jika sedang dites di localhost, script akan otomatis meminjam / nge-fetch ke proxy yang sudah dideploy live di Vercel
+        const isLocalHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' || window.location.protocol === 'file:';
+        const baseUrl = isLocalHost ? 'https://ldp-mng-tracker.vercel.app' : '';
+        const proxyUrl = `${baseUrl}/api/proxy?event=${eventName}`;
         
         const response = await fetch(proxyUrl);
         if (!response.ok) {
             throw new Error(`HTTP Error: ${response.status}`);
         }
         
-        const proxyJson = await response.json();
-        
-        if (!proxyJson.contents) {
-             throw new Error("Data gagal di-fetch oleh proxy.");
-        }
-        
-        const resJson = JSON.parse(proxyJson.contents);
+        const resJson = await response.json();
         
         if (!resJson.status) {
             throw new Error(resJson.message || 'Gagal mengambil data dari API pusat.');
