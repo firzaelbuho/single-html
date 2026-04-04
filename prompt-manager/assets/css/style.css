@@ -1,0 +1,158 @@
+/* Custom styles to supplement Tailwind */
+
+/* Custom Scrollbar for sidebar and main content */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Modal Transitions */
+#promptModal.show, #exportModal.show, #importModal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#promptModal.show > div, #exportModal.show > div, #importModal.show > div {
+    transform: scale(1);
+}
+
+/* Toast Transitions */
+#toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Form inputs scrollbar */
+.custom-scroll::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+/* Checkboxes Global Override for Dark Mode */
+input[type="checkbox"] {
+    appearance: none;
+    background-color: transparent;
+    border: 2px solid #475569;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+input[type="checkbox"]:hover {
+    border-color: #6366f1;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+input[type="checkbox"]:checked::after {
+    content: '';
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-bottom: 2px;
+}
+
+/* Checkbox container for cards */
+.prompt-checkbox-container {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+}
+
+/* Card styling & hover animation */
+.prompt-card {
+    transition: all 0.2s ease;
+    border: 1px solid #334155;
+}
+
+.prompt-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+    border-right-color: #475569;
+    border-top-color: #475569;
+    border-bottom-color: #475569;
+}
+
+.prompt-card.selected {
+    box-shadow: 0 0 0 1px #6366f1;
+    background-color: rgba(99, 102, 241, 0.05); /* very subtle indigo tint */
+    border-color: #6366f1;
+}
+
+.prompt-card:hover .prompt-checkbox-container,
+.prompt-card:has(input[type="checkbox"]:checked) .prompt-checkbox-container {
+    opacity: 1;
+}
+
+/* Dropdown styling */
+.card-dropdown {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-dropdown.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+/* Truncate multi-line */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+}
+
+.select-dark {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+.variant-tab {
+    position: relative;
+}
+.variant-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: #818cf8;
+    border-radius: 2px;
+}

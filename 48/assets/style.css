@@ -1,0 +1,58 @@
+/* Custom Styles for JKT48 Fanweb */
+
+body {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Sleek Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Tab Switching Animation */
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Force hidden for modal utility */
+#member-modal.hidden {
+    display: none !important;
+}
+
+/* Image skeleton loading effect */
+.img-skeleton {
+    background-color: #f1f5f9;
+    position: relative;
+    overflow: hidden;
+}
+.img-skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: slideShimmer 1.5s infinite;
+}
+@keyframes slideShimmer {
+    100% { transform: translateX(100%); }
+}
+
+/* Prevent image flash and enforce containment */
+.member-card img {
+    color: transparent; /* hides alt text while loading */
+}

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Manager</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Quicksand -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-[#0f172a] text-slate-300 font-sans antialiased h-screen flex overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#1e293b] border-r border-[#1e293b] flex flex-col h-full z-10 shadow-[2px_0_15px_-3px_rgba(0,0,0,0.3)] selection::bg-indigo-500/30">
+        <div class="px-6 py-5 border-b border-slate-700/50 flex items-center space-x-3">
+            <div class="bg-indigo-500 text-white p-2 rounded-lg shadow-sm shadow-indigo-500/20">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <h1 class="font-bold text-xl tracking-tight text-white">PromptMgr</h1>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+            <!-- Search -->
+            <div>
+                <div class="relative group">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 group-focus-within:text-indigo-400 transition-colors">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Search prompts..." class="w-full pl-10 pr-4 py-2 bg-[#0f172a] border border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-slate-200 placeholder-slate-500 transition-all">
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div>
+                <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">Categories</h3>
+                <ul class="space-y-1" id="categoryFilterList">
+                    <!-- dynamic categories injected here -->
+                </ul>
+            </div>
+
+            <!-- Tags -->
+            <div>
+                <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">Tags</h3>
+                <div class="flex flex-wrap gap-2 px-2" id="tagFilterList">
+                    <!-- dynamic tags injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer / Export Import -->
+        <div class="p-4 border-t border-slate-700/50 flex flex-col space-y-2">
+            <button id="exportBtn" class="w-full flex items-center justify-center px-4 py-2 border border-slate-700 rounded-lg text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-indigo-400 hover:border-slate-600 transition-colors bg-[#0f172a]/50">
+                <i class="fa-solid fa-download mr-2"></i> Export Data
+            </button>
+            <label class="w-full flex items-center justify-center px-4 py-2 border border-slate-700 rounded-lg text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-indigo-400 hover:border-slate-600 transition-colors bg-[#0f172a]/50 cursor-pointer">
+                <i class="fa-solid fa-upload mr-2"></i> Import Data
+                <input type="file" id="importInput" accept=".json" class="hidden">
+            </label>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full bg-[#0f172a] relative">
+        <!-- Header -->
+        <header class="h-16 bg-[#1e293b]/70 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-8 absolute top-0 w-full z-10 shadow-sm">
+            <div class="flex items-center space-x-4">
+                <h2 class="text-xl font-bold text-slate-100" id="currentViewTitle">All Prompts</h2>
+                <div class="flex items-center space-x-2 text-sm text-slate-400 bg-[#0f172a]/50 px-3 py-1.5 rounded-lg border border-slate-700/50">
+                    <span id="sortSelectWrapper" class="relative group cursor-pointer flex items-center">
+                        <i class="fa-solid fa-sort mr-2 text-slate-500"></i> <span id="currentSortLabel" class="font-semibold text-slate-300">Newest First</span>
+                        <select id="sortSelect" class="absolute inset-0 opacity-0 cursor-pointer w-full">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="alpha">A-Z</option>
+                        </select>
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="bulkDeleteBtn" class="hidden items-center px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-sm font-bold hover:bg-red-500/20 transition-colors shadow-sm">
+                    <i class="fa-solid fa-trash-can mr-2"></i> Delete (<span id="selectedCount">0</span>)
+                </button>
+                <button id="newPromptBtn" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-500 transition-colors shadow-sm shadow-indigo-900/50 transform active:scale-95 border border-indigo-500">
+                    <i class="fa-solid fa-plus mr-2"></i> New Prompt
+                </button>
+            </div>
+        </header>
+
+        <!-- Prompt Grid/List View -->
+        <div class="flex-1 overflow-y-auto px-8 pt-24 pb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="promptGrid">
+                <!-- dynamic prompts injected here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Modal (Hidden by default) -->
+    <div id="promptModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <!-- use max-h-[90vh] so it scrolls neatly -->
+        <div class="bg-[#1e293b] border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="promptModalContent">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700/50 bg-[#1e293b] flex-shrink-0 rounded-t-2xl">
+                <h3 class="text-lg font-bold text-white" id="modalTitle">Create New Prompt</h3>
+                <button id="closeModalBtn" class="text-slate-400 hover:text-white transition-colors rounded-full p-1 hover:bg-slate-700">
+                    <i class="fa-solid fa-xmark text-lg w-6 h-6 flex items-center justify-center"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 overflow-y-auto w-full custom-scroll">
+                <form id="promptForm" class="space-y-5">
+                    <input type="hidden" id="promptId">
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-1">Title</label>
+                        <input type="text" id="promptTitle" required placeholder="e.g. Generate Mountain" class="w-full px-4 py-2.5 bg-[#0f172a] border border-slate-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-slate-200 placeholder-slate-500 transition-colors">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-300 mb-1">Category</label>
+                            <select id="promptCategory" required class="w-full px-4 py-2.5 bg-[#0f172a] border border-slate-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-slate-200 transition-colors appearance-none select-dark">
+                                <option value="Code">Code</option>
+                                <option value="Image">Image</option>
+                                <option value="Audio">Audio</option>
+                                <option value="Video">Video</option>
+                                <option value="Text">Text</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-300 mb-1">Tags (comma separated)</label>
+                            <input type="text" id="promptTags" placeholder="e.g. landscape, snowy, scenic" class="w-full px-4 py-2.5 bg-[#0f172a] border border-slate-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-slate-200 placeholder-slate-500 transition-colors">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-1">Main Content (Default)</label>
+                        <textarea id="promptContent" required rows="4" placeholder="Write your main prompt here..." class="w-full px-4 py-3 bg-[#0f172a] border border-slate-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-slate-200 placeholder-slate-500 transition-colors font-mono text-[13px] resize-y leading-relaxed shadow-inner"></textarea>
+                    </div>
+
+                    <!-- Variants Section -->
+                    <div class="border-t border-slate-700/50 pt-5 mt-2">
+                        <div class="flex items-center justify-between mb-4">
+                            <label class="block text-sm font-semibold text-slate-300">Variants (Optional)</label>
+                            <button type="button" id="addVariantBtn" class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-lg hover:bg-indigo-500/20 transition-colors border border-indigo-500/20 flex items-center">
+                                <i class="fa-solid fa-plus mr-1.5"></i> Add Variant
+                            </button>
+                        </div>
+                        <div id="variantsContainer" class="space-y-4">
+                            <!-- Injected variant inputs -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-[#1e293b] flex justify-end space-x-3 border-t border-slate-700/50 flex-shrink-0 rounded-b-2xl">
+                <button type="button" id="cancelBtn" class="px-5 py-2.5 text-sm font-bold text-slate-300 bg-[#0f172a] border border-slate-700 rounded-xl hover:bg-slate-800 hover:text-white transition-colors shadow-sm">Cancel</button>
+                <button type="button" id="saveBtn" class="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 shadow-sm shadow-indigo-900/30 border border-indigo-500 transition-colors">Save Prompt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal (Hidden by default) -->
+    <div id="exportModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <div class="bg-[#1e293b] border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-lg transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700/50 bg-[#1e293b] flex-shrink-0 rounded-t-2xl">
+                <h3 class="text-lg font-bold text-white">Export Prompts</h3>
+                <button id="closeExportModalBtn" class="text-slate-400 hover:text-white transition-colors rounded-full p-1 hover:bg-slate-700">
+                    <i class="fa-solid fa-xmark text-lg w-6 h-6 flex items-center justify-center"></i>
+                </button>
+            </div>
+            <div class="p-4 border-b border-slate-700/50 bg-[#0f172a]/50 flex justify-between items-center flex-shrink-0">
+                <label class="flex items-center space-x-2 text-sm font-semibold text-slate-300 cursor-pointer">
+                    <input type="checkbox" id="exportSelectAll" class="w-4 h-4 rounded border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900">
+                    <span>Select All</span>
+                </label>
+                <span class="text-xs font-medium text-slate-500"><span id="exportSelectedCount">0</span> selected</span>
+            </div>
+            <div class="p-2 overflow-y-auto custom-scroll">
+                <ul id="exportPromptList" class="divide-y divide-slate-800/50">
+                    <!-- dynamically injected checkboxes -->
+                </ul>
+            </div>
+            <div class="px-6 py-4 bg-[#1e293b] flex justify-end space-x-3 border-t border-slate-700/50 flex-shrink-0 rounded-b-2xl">
+                <button type="button" id="cancelExportBtn" class="px-5 py-2.5 text-sm font-bold text-slate-300 bg-[#0f172a] border border-slate-700 rounded-xl hover:bg-slate-800 hover:text-white transition-colors shadow-sm">Cancel</button>
+                <button type="button" id="confirmExportBtn" class="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 border border-indigo-500 shadow-sm transition-colors cursor-not-allowed opacity-50" disabled>Export Selected</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal (Hidden by default) -->
+    <div id="importModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <div class="bg-[#1e293b] border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-lg transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700/50 bg-[#1e293b] flex-shrink-0 rounded-t-2xl">
+                <h3 class="text-lg font-bold text-white">Import Prompts</h3>
+                <button id="closeImportModalBtn" class="text-slate-400 hover:text-white transition-colors rounded-full p-1 hover:bg-slate-700">
+                    <i class="fa-solid fa-xmark text-lg w-6 h-6 flex items-center justify-center"></i>
+                </button>
+            </div>
+            <div class="p-5 border-b border-slate-700/50 bg-[#1e293b] flex-shrink-0">
+                <p class="text-sm font-bold text-slate-400 mb-3">Import Behavior:</p>
+                <div class="flex space-x-5">
+                    <label class="flex items-center space-x-2 text-sm cursor-pointer font-semibold text-slate-300">
+                        <input type="radio" name="importMode" value="merge" class="w-4 h-4 text-indigo-500 bg-slate-800 border-slate-600 focus:ring-indigo-500 focus:ring-offset-slate-900" checked>
+                        <span>Merge with existing</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm cursor-pointer font-semibold">
+                        <input type="radio" name="importMode" value="replace" class="w-4 h-4 text-red-500 bg-slate-800 border-slate-600 focus:ring-red-500 focus:ring-offset-slate-900">
+                        <span class="text-red-400">Clear all & Replace</span>
+                    </label>
+                </div>
+            </div>
+            <div class="p-4 border-b border-slate-700/50 bg-[#0f172a]/50 flex justify-between items-center flex-shrink-0">
+                <label class="flex items-center space-x-2 text-sm font-semibold text-slate-300 cursor-pointer">
+                    <input type="checkbox" id="importSelectAll" class="w-4 h-4 rounded border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900" checked>
+                    <span>Select All to Import</span>
+                </label>
+                <span class="text-xs font-medium text-slate-500"><span id="importSelectedCount">0</span> selected</span>
+            </div>
+            <div class="p-2 overflow-y-auto flex-1 custom-scroll">
+                <ul id="importPromptList" class="divide-y divide-slate-800/50">
+                    <!-- dynamically injected items -->
+                </ul>
+            </div>
+            <div class="px-6 py-4 bg-[#1e293b] flex justify-end space-x-3 border-t border-slate-700/50 flex-shrink-0 rounded-b-2xl">
+                <button type="button" id="cancelImportBtn" class="px-5 py-2.5 text-sm font-bold text-slate-300 bg-[#0f172a] border border-slate-700 rounded-xl hover:bg-slate-800 hover:text-white transition-colors shadow-sm">Cancel</button>
+                <button type="button" id="confirmImportBtn" class="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 border border-indigo-500 rounded-xl hover:bg-indigo-500 shadow-sm transition-colors">Import Selected</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 shadow-2xl border border-slate-700 rounded-xl px-5 py-3.5 flex items-center space-x-3 transform translate-y-20 opacity-0 transition-all duration-300 z-[60]">
+        <div id="toastIcon" class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <div>
+            <p id="toastMessage" class="text-sm font-bold text-slate-200 shadow-sm">Saved successfully</p>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

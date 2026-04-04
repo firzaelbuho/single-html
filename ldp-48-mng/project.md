@@ -10,3 +10,6 @@ aplikasi web tracking status penjualan dan sisa kuota tiket meet and greet dan 2
 tampilan dibuat keren menarik dan fitur lengkap berdasar api yang tersedia
 
 api docs : api.md
+
+
+nanti ada juga fitur sorting berdasarkan nama member atau jumlah tiket yg terjualnya, asc / desc
