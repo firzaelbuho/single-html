@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMG Tool - Resizer & Icon Generator</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Cropper.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+  
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body class="bg-slate-900 text-slate-200 font-sans antialiased h-screen flex overflow-hidden">
+
+  <!-- Mobile Sidebar Overlay -->
+  <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-20 hidden lg:hidden transition-opacity opacity-0"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="bg-slate-800 w-64 h-full border-r border-slate-700 flex flex-col absolute lg:relative z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+    <div class="h-16 flex items-center px-6 border-b border-slate-700 justify-between lg:justify-start">
+      <div class="flex items-center gap-2 text-indigo-400">
+        <i class="ph-fill ph-images text-2xl"></i>
+        <h1 class="text-xl font-bold tracking-tight text-white">IMG Tool</h1>
+      </div>
+      <button id="close-sidebar" class="lg:hidden text-slate-400 hover:text-white">
+        <i class="ph ph-x text-xl"></i>
+      </button>
+    </div>
+    
+    <nav class="flex-1 px-4 py-6 space-y-2">
+      <button onclick="app.switchTab('resizer')" id="tab-resizer" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium transition-colors bg-indigo-500/10 text-indigo-400">
+        <i class="ph ph-crop text-xl"></i>
+        <span>IMG Resizer</span>
+      </button>
+      
+      <button onclick="app.switchTab('icon')" id="tab-icon" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium transition-colors text-slate-400 hover:bg-slate-700/50 hover:text-white">
+        <i class="ph ph-app-window text-xl"></i>
+        <span>Icon Generator</span>
+      </button>
+
+      <button onclick="app.switchTab('converter')" id="tab-converter" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium transition-colors text-slate-400 hover:bg-slate-700/50 hover:text-white">
+        <i class="ph ph-files text-xl"></i>
+        <span>Batch Converter</span>
+      </button>
+    </nav>
+
+    <div class="p-6 border-t border-slate-700 text-sm text-slate-500">
+      <p>&copy; 2026 Elbuho</p>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+    
+    <!-- Topbar Mobile -->
+    <header class="h-16 lg:hidden bg-slate-800 border-b border-slate-700 flex items-center px-4 shrink-0">
+      <button id="open-sidebar" class="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg">
+        <i class="ph ph-list text-2xl"></i>
+      </button>
+      <h2 id="mobile-header-title" class="ml-4 text-lg font-semibold text-white">IMG Resizer</h2>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <div class="flex-1 overflow-auto bg-slate-900 p-4 lg:p-8 relative">
+      
+      <!-- TOOL: IMG RESIZER -->
+      <section id="section-resizer" class="max-w-6xl mx-auto h-full flex flex-col xl:flex-row gap-6 animate-fade-in block">
+        
+        <!-- Left Column: Canvas/Preview -->
+        <div class="flex-1 flex flex-col bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden min-h-[400px]">
+          <div class="p-4 border-b border-slate-700 flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-800/80">
+            <h3 class="font-medium text-slate-300 flex items-center gap-2">
+              <i class="ph ph-image"></i> Workspace
+            </h3>
+            
+            <div class="flex items-center gap-2">
+              <div class="flex bg-slate-900 rounded-lg border border-slate-700 p-1 mr-2 hidden" id="resizer-center-controls">
+                <button title="Center Horizontally" onclick="app.centerImage('horizontal')" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-md transition border border-transparent hover:border-slate-600 focus:outline-none">
+                  <i class="ph ph-arrows-out-line-horizontal text-lg"></i>
+                </button>
+                <button title="Center Vertically" onclick="app.centerImage('vertical')" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-md transition border border-transparent hover:border-slate-600 focus:outline-none">
+                  <i class="ph ph-arrows-out-line-vertical text-lg"></i>
+                </button>
+                <button title="Center Both" onclick="app.centerImage('both')" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-md transition border border-transparent hover:border-slate-600 focus:outline-none">
+                  <i class="ph ph-crosshair text-lg"></i>
+                </button>
+              </div>
+
+              <label class="cursor-pointer bg-slate-700 border border-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-600 text-white transition-colors shadow-sm flex items-center gap-2">
+                <i class="ph ph-upload-simple"></i> Upload Image
+                <input type="file" id="resizer-upload" class="hidden" accept="image/*" />
+              </label>
+            </div>
+          </div>
+          
+          <div class="flex-1 bg-slate-950 relative items-center justify-center flex p-4" id="resizer-workspace">
+             <div class="text-center text-slate-600 flex flex-col items-center" id="resizer-empty-state">
+                <i class="ph ph-image-square text-6xl mb-3 opacity-50"></i>
+                <p>Upload an image to start resizing</p>
+             </div>
+             <!-- The image inside a container to let cropper take over -->
+             <div id="cropper-container" class="absolute w-full h-full p-4 hidden">
+                <img id="cropper-image" src="" class="max-w-full hidden" />
+             </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Controls -->
+        <div class="w-full xl:w-80 flex-shrink-0 flex flex-col gap-6">
+          <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6">
+            <h3 class="text-lg font-semibold text-white mb-4">Resize Settings</h3>
+            
+            <div class="mb-5">
+              <label class="block text-sm font-medium text-slate-400 mb-2">Preset Ratio</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button class="ratio-btn px-2 py-2 text-sm border rounded-lg border-indigo-500 bg-indigo-500/20 text-indigo-400" data-ratio="1">1:1</button>
+                <button class="ratio-btn px-2 py-2 text-sm border rounded-lg border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300" data-ratio="1.33333333333">4:3</button>
+                <button class="ratio-btn px-2 py-2 text-sm border rounded-lg border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300" data-ratio="0.75">3:4</button>
+                <button class="ratio-btn px-2 py-2 text-sm border rounded-lg border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300" data-ratio="1.77777777778">16:9</button>
+                <button class="ratio-btn px-2 py-2 text-sm border rounded-lg border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300" data-ratio="0.5625">9:16</button>
+                <button class="ratio-btn px-2 py-2 text-sm border rounded-lg border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300" data-ratio="NaN">Free</button>
+              </div>
+            </div>
+
+            <div class="mb-5">
+              <label class="block text-sm font-medium text-slate-400 mb-2">Target Resolution (px)</label>
+              <div class="flex items-center gap-2">
+                <input type="number" id="resizer-width" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-600" placeholder="Width">
+                <span class="text-slate-500 text-sm">X</span>
+                <input type="number" id="resizer-height" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-600" placeholder="Height">
+              </div>
+              <p class="text-xs text-slate-500 mt-2"><i class="ph ph-info"></i> Leave empty to use crop selection size.</p>
+            </div>
+
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-400 mb-2">Format</label>
+              <select id="resizer-format" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                <option value="image/jpeg">JPG</option>
+                <option value="image/png">PNG</option>
+                <option value="image/webp">WEBP</option>
+              </select>
+            </div>
+
+            <button id="resizer-export" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl transition-all shadow-lg shadow-indigo-900/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="ph ph-download-simple text-lg"></i>
+              Export Image
+            </button>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- TOOL: ICON GENERATOR -->
+      <section id="section-icon" class="max-w-6xl mx-auto h-full flex flex-col xl:flex-row gap-6 hidden">
+        
+        <!-- Left Column: Canvas/Preview -->
+        <div class="flex-1 flex flex-col bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden min-h-[400px]">
+          <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/80">
+            <h3 class="font-medium text-slate-300 flex items-center gap-2">
+              <i class="ph ph-app-window"></i> Source Icon
+            </h3>
+            <label class="cursor-pointer bg-slate-700 border border-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-600 text-white transition-colors shadow-sm flex items-center gap-2">
+              <i class="ph ph-upload-simple"></i> Upload Icon (1:1 Native)
+              <input type="file" id="icon-upload" class="hidden" accept="image/*" />
+            </label>
+          </div>
+          
+          <div class="flex-1 bg-slate-950 relative items-center justify-center flex p-4">
+             <div class="text-center text-slate-600 flex flex-col items-center" id="icon-empty-state">
+                <i class="ph ph-shapes text-6xl mb-3 opacity-50"></i>
+                <p>Upload a square icon to generate sizes</p>
+             </div>
+             <div id="icon-preview-container" class="hidden flex flex-col items-center">
+                 <img id="icon-image" src="" class="max-w-xs max-h-64 rounded-xl shadow-2xl border border-slate-800 bg-slate-900 p-2" />
+                 <p class="text-sm text-slate-400 mt-4 font-medium" id="icon-original-size">Original Size: 0x0</p>
+             </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Controls -->
+        <div class="w-full xl:w-80 flex-shrink-0 flex flex-col gap-6">
+          <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6 flex flex-col h-full max-h-[calc(100vh-100px)]">
+            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+               Target Sizes <span class="bg-slate-700 text-xs px-2 py-1 rounded-md text-slate-300">1:1 Ratio</span>
+            </h3>
+
+            <div class="flex-1 overflow-y-auto mb-4 custom-scrollbar pr-2">
+               <!-- Checkboxes will be injected here via JS -->
+               <div id="icon-sizes-list" class="grid grid-cols-2 gap-3">
+                  <!-- JS Rendered -->
+               </div>
+            </div>
+            
+            <div class="mb-5 pt-4 border-t border-slate-700">
+               <label class="block text-sm font-medium text-slate-400 mb-2">Add Custom Size (px)</label>
+               <div class="flex items-center gap-2">
+                 <input type="number" id="icon-custom-size" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder-slate-600" placeholder="e.g. 144">
+                 <button id="add-custom-size" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-2 rounded-lg font-medium transition-colors text-sm">Add</button>
+               </div>
+            </div>
+
+            <button id="icon-generate" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl transition-all shadow-lg shadow-indigo-900/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="ph ph-file-zip text-lg"></i>
+              Generate ZIP
+            </button>
+            <div id="icon-progress" class="hidden mt-3 h-1 w-full bg-slate-700 rounded-full overflow-hidden">
+                <div id="icon-progress-bar" class="h-full bg-indigo-400 w-0 transition-all duration-300"></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- TOOL: BATCH CONVERTER -->
+      <section id="section-converter" class="max-w-6xl mx-auto h-full flex flex-col xl:flex-row gap-6 hidden">
+        
+        <!-- Left Column: File List -->
+        <div class="flex-1 flex flex-col bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden min-h-[400px]">
+          <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/80">
+            <h3 class="font-medium text-slate-300 flex items-center gap-2">
+              <i class="ph ph-files"></i> Files to Convert
+            </h3>
+            <label class="cursor-pointer bg-slate-700 border border-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-600 text-white transition-colors shadow-sm flex items-center gap-2">
+              <i class="ph ph-upload-simple"></i> Upload Files
+              <input type="file" id="converter-upload" class="hidden" accept="image/*" multiple />
+            </label>
+          </div>
+          
+          <div class="flex-1 bg-slate-900 relative p-4 overflow-y-auto custom-scrollbar" id="converter-workspace">
+             <div class="h-full flex items-center justify-center">
+                 <div class="text-center text-slate-600 flex flex-col items-center" id="converter-empty-state">
+                    <i class="ph ph-file-dashed text-6xl mb-3 opacity-50"></i>
+                    <p>Upload multiple images to convert them at once</p>
+                 </div>
+             </div>
+             
+             <div id="converter-file-list" class="w-full flex flex-col gap-2 hidden">
+                 <!-- File rows inserted via JS -->
+             </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Controls -->
+        <div class="w-full xl:w-80 flex-shrink-0 flex flex-col gap-6">
+          <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6 flex flex-col">
+            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+               Target Formatting
+            </h3>
+
+            <div class="mb-5">
+              <label class="block text-sm font-medium text-slate-400 mb-2">Convert to Format</label>
+              <select id="converter-format" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                <option value="image/jpeg">JPG</option>
+                <option value="image/png">PNG</option>
+                <option value="image/webp">WEBP</option>
+              </select>
+            </div>
+
+            <button id="converter-generate" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl transition-all shadow-lg shadow-indigo-900/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="ph ph-arrows-clockwise text-lg"></i>
+              Convert & Download ZIP
+            </button>
+            <div id="converter-progress" class="hidden mt-3 h-1 w-full bg-slate-700 rounded-full overflow-hidden">
+                <div id="converter-progress-bar" class="h-full bg-indigo-400 w-0 transition-all duration-300"></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- External scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  
+  <script src="assets/script.js"></script>
+</body>
+</html>
