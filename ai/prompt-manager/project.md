@@ -4,6 +4,8 @@ JKT48 Fanweb
 - ada file css dan js script didalam folder assets
 - ui utama pakai tailwind, baru kalau butuh lebih customize pakai css file
 - ui minimmalis clean tapi nyaman
+- font pakai quicksand
+
 
 adalah aplikasi web untuk management prompt untuk kebutuhan AI
 

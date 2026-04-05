@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>Super Note</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        gray: require('tailwindcss/colors').zinc,
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Outfit & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Highlight.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/tokyo-night-dark.min.css">
+    <!-- Highlight.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-gray-950 text-gray-300 font-sans antialiased h-screen flex overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 border-r border-gray-800 flex flex-col h-full z-10 shadow-xl">
+        <div class="px-6 py-5 border-b border-gray-800 flex items-center space-x-3">
+            <div class="bg-indigo-500 text-white p-2 rounded-xl shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h1 class="font-extrabold text-2xl tracking-tight text-white">Super Note</h1>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto px-4 py-6 space-y-8 custom-scroll">
+            <!-- Search -->
+            <div>
+                <div class="relative group">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 group-focus-within:text-indigo-400 transition-colors">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Search notes..." class="w-full pl-10 pr-4 py-2.5 bg-gray-950/50 border border-gray-800 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-gray-200 placeholder-gray-500 transition-all shadow-inner">
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div>
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">Categories</h3>
+                <ul class="space-y-1" id="categoryFilterList">
+                    <!-- dynamic categories injected here -->
+                </ul>
+            </div>
+
+            <!-- Tags -->
+            <div>
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">Tags</h3>
+                <div class="flex flex-wrap gap-2 px-2" id="tagFilterList">
+                    <!-- dynamic tags injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer / Export Import -->
+        <div class="p-4 border-t border-gray-800 flex flex-col space-y-2 bg-gray-900">
+            <button id="exportBtn" class="w-full flex items-center justify-center px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm font-semibold text-gray-300 hover:bg-gray-700 hover:text-white transition-colors shadow-sm">
+                <i class="fa-solid fa-download mr-2"></i> Export Data
+            </button>
+            <label class="w-full flex items-center justify-center px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm font-semibold text-gray-300 hover:bg-gray-700 hover:text-white transition-colors shadow-sm cursor-pointer">
+                <i class="fa-solid fa-upload mr-2"></i> Import Data
+                <input type="file" id="importInput" accept=".json" class="hidden">
+            </label>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full bg-gray-950 relative">
+        <!-- Header -->
+        <header class="h-20 bg-gray-950/80 backdrop-blur-xl border-b border-gray-800 flex items-center justify-between px-8 absolute top-0 w-full z-10">
+            <div class="flex items-center space-x-5">
+                <h2 class="text-2xl font-bold text-gray-100 tracking-tight" id="currentViewTitle">All Notes</h2>
+                <div class="flex items-center space-x-2 text-sm text-gray-400 bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800">
+                    <span id="sortSelectWrapper" class="relative group cursor-pointer flex items-center hover:text-gray-200 transition-colors">
+                        <i class="fa-solid fa-sort mr-2 text-indigo-400"></i> <span id="currentSortLabel" class="font-semibold">Newest</span>
+                        <select id="sortSelect" class="absolute inset-0 opacity-0 cursor-pointer w-full bg-gray-900 text-gray-200">
+                            <option value="newest" class="bg-gray-900 text-gray-200">Newest</option>
+                            <option value="oldest" class="bg-gray-900 text-gray-200">Oldest</option>
+                            <option value="alpha" class="bg-gray-900 text-gray-200">A-Z</option>
+                        </select>
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="bulkDeleteBtn" class="hidden items-center px-4 py-2.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl text-sm font-bold hover:bg-red-500/20 transition-colors shadow-sm">
+                    <i class="fa-solid fa-trash-can mr-2"></i> Delete (<span id="selectedCount">0</span>)
+                </button>
+                <div class="w-px h-8 bg-gray-800 mx-2"></div>
+                <button id="newNoteBtn" class="flex items-center px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-900/40 transform active:scale-95 border border-indigo-500">
+                    <i class="fa-solid fa-plus mr-2"></i> New Note
+                </button>
+            </div>
+        </header>
+
+        <!-- Note Grid/List View -->
+        <div class="flex-1 overflow-y-auto px-8 pt-28 pb-8 custom-scroll">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start gap-6" id="noteGrid">
+                <!-- dynamic notes injected here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Create / Edit Note Modal (Hidden by default) -->
+    <div id="noteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <div class="bg-gray-900 border border-gray-700/50 rounded-2xl shadow-2xl w-full max-w-3xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="noteModalContent">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-5 border-b border-gray-800 bg-gray-900 flex-shrink-0 rounded-t-2xl">
+                <div class="flex items-center space-x-3">
+                    <div id="modalIcon" class="w-8 h-8 rounded-lg flex items-center justify-center text-white bg-gray-700 shadow-sm border border-white/10">
+                        <i class="fa-solid fa-pen"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white tracking-tight" id="modalTitle">Create Note</h3>
+                </div>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-white transition-colors rounded-full p-2 hover:bg-gray-800">
+                    <i class="fa-solid fa-xmark text-lg w-5 h-5 flex items-center justify-center"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 overflow-y-auto w-full custom-scroll bg-gray-950/30">
+                <form id="noteForm" class="space-y-6">
+                    <input type="hidden" id="noteId">
+                    
+                    <!-- Title & Category Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">Title</label>
+                            <input type="text" id="noteTitle" required placeholder="Project Ideas..." class="w-full px-4 py-3 bg-gray-950 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-gray-100 placeholder-gray-600 transition-all font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">Category</label>
+                            <select id="noteCategory" required class="w-full px-4 py-3 bg-gray-950 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-gray-100 transition-colors appearance-none select-dark font-medium">
+                                <option value="normal">📝 Normal Note</option>
+                                <option value="todo">✅ Todo List</option>
+                                <option value="snippet">💻 Code Snippet</option>
+                                <option value="reminder">⏰ Reminder</option>
+                                <option value="link">🔗 Link Bookmark</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Tags <span class="text-gray-500 font-normal">(comma separated)</span></label>
+                        <input type="text" id="noteTags" placeholder="work, ideas, urgent" class="w-full px-4 py-2.5 bg-gray-950 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-gray-300 placeholder-gray-600 transition-all text-sm">
+                    </div>
+
+                    <!-- Variants Section -->
+                    <div class="border border-gray-800 rounded-xl overflow-hidden bg-gray-900 shadow-sm">
+                        <div class="flex items-center justify-between px-5 py-3 border-b border-gray-800 bg-gray-800/50">
+                            <label class="block text-sm font-bold text-gray-200">Content Variants</label>
+                            <button type="button" id="addVariantBtn" class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-lg hover:bg-indigo-500/20 transition-colors border border-indigo-500/20 flex items-center">
+                                <i class="fa-solid fa-plus mr-1.5"></i> Add Variant
+                            </button>
+                        </div>
+                        <div class="p-5 bg-gray-900">
+                            <div id="variantsContainer" class="space-y-6">
+                                <!-- Injected variant editors -->
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Footer -->
+            <div class="px-6 py-5 bg-gray-900 flex items-center justify-between border-t border-gray-800 flex-shrink-0 rounded-b-2xl">
+                <div>
+                     <span class="text-xs text-gray-500 italic"><i class="fa-solid fa-info-circle mr-1"></i> Data autosaved to localStorage.</span>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="button" id="cancelBtn" class="px-5 py-2.5 text-sm font-bold text-gray-300 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 hover:text-white transition-colors shadow-sm">Cancel</button>
+                    <button type="submit" form="noteForm" id="saveBtn" class="px-6 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 shadow-lg shadow-indigo-900/40 border border-indigo-500 transition-all hover:-translate-y-0.5">Save Note</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal (Hidden by default) -->
+    <div id="exportModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <!-- Close on overlay click NOT ENABLED -->
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl w-full max-w-lg transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between px-6 py-5 border-b border-gray-800 bg-gray-900 flex-shrink-0 rounded-t-2xl">
+                <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-file-export mr-2 text-indigo-400"></i> Export Notes</h3>
+                <button id="closeExportModalBtn" class="text-gray-400 hover:text-white transition-colors rounded-full p-2 hover:bg-gray-800">
+                    <i class="fa-solid fa-xmark text-lg w-5 h-5 flex items-center justify-center"></i>
+                </button>
+            </div>
+            <div class="p-4 border-b border-gray-800 bg-gray-950 flex justify-between items-center flex-shrink-0">
+                <label class="flex items-center space-x-3 text-sm font-semibold text-gray-300 cursor-pointer group">
+                    <input type="checkbox" id="exportSelectAll" class="w-4 h-4 rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-900 transition-colors">
+                    <span class="group-hover:text-white transition-colors">Select All</span>
+                </label>
+                <span class="text-xs font-bold px-2.5 py-1 bg-gray-800 rounded-full text-indigo-400"><span id="exportSelectedCount">0</span> selected</span>
+            </div>
+            <div class="p-2 overflow-y-auto custom-scroll flex-1">
+                <ul id="exportNoteList" class="divide-y divide-gray-800/50">
+                    <!-- dynamically injected checkboxes -->
+                </ul>
+            </div>
+            <div class="px-6 py-4 bg-gray-900 flex justify-end space-x-3 border-t border-gray-800 flex-shrink-0 rounded-b-2xl">
+                <button type="button" id="cancelExportBtn" class="px-5 py-2.5 text-sm font-bold text-gray-300 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 hover:text-white transition-colors shadow-sm">Cancel</button>
+                <button type="button" id="confirmExportBtn" class="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 border border-indigo-500 shadow-sm transition-colors cursor-not-allowed opacity-50 flex items-center" disabled>
+                    <i class="fa-solid fa-download mr-2"></i> Export JSON
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal (Hidden by default) -->
+    <div id="importModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <!-- Close on overlay click NOT ENABLED -->
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl w-full max-w-lg transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between px-6 py-5 border-b border-gray-800 bg-gray-900 flex-shrink-0 rounded-t-2xl">
+                <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-file-import mr-2 text-indigo-400"></i> Import Notes</h3>
+                <button id="closeImportModalBtn" class="text-gray-400 hover:text-white transition-colors rounded-full p-2 hover:bg-gray-800">
+                    <i class="fa-solid fa-xmark text-lg w-5 h-5 flex items-center justify-center"></i>
+                </button>
+            </div>
+            <div class="p-5 border-b border-gray-800 bg-gray-900 flex-shrink-0">
+                <p class="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider text-xs">Import Behavior</p>
+                <div class="flex space-x-5">
+                    <label class="flex items-center space-x-2 text-sm cursor-pointer font-semibold text-gray-300">
+                        <input type="radio" name="importMode" value="merge" class="w-4 h-4 text-indigo-500 bg-gray-800 border-gray-600 focus:ring-indigo-500 focus:ring-offset-gray-900" checked>
+                        <span>Merge with existing</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm cursor-pointer font-semibold">
+                        <input type="radio" name="importMode" value="replace" class="w-4 h-4 text-rose-500 bg-gray-800 border-gray-600 focus:ring-rose-500 focus:ring-offset-gray-900">
+                        <span class="text-rose-400">Clear all & Replace</span>
+                    </label>
+                </div>
+            </div>
+            <div class="p-4 border-b border-gray-800 bg-gray-950 flex justify-between items-center flex-shrink-0">
+                <label class="flex items-center space-x-2 text-sm font-semibold text-gray-300 cursor-pointer group">
+                    <input type="checkbox" id="importSelectAll" class="w-4 h-4 rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-900" checked>
+                    <span class="group-hover:text-white transition-colors">Select All to Import</span>
+                </label>
+                <span class="text-xs font-bold px-2.5 py-1 bg-gray-800 rounded-full text-indigo-400"><span id="importSelectedCount">0</span> selected</span>
+            </div>
+            <div class="p-2 overflow-y-auto flex-1 custom-scroll">
+                <ul id="importNoteList" class="divide-y divide-gray-800/50">
+                    <!-- dynamically injected items -->
+                </ul>
+            </div>
+            <div class="px-6 py-4 bg-gray-900 flex justify-end space-x-3 border-t border-gray-800 flex-shrink-0 rounded-b-2xl">
+                <button type="button" id="cancelImportBtn" class="px-5 py-2.5 text-sm font-bold text-gray-300 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 hover:text-white transition-colors shadow-sm">Cancel</button>
+                <button type="button" id="confirmImportBtn" class="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 border border-indigo-500 rounded-xl hover:bg-indigo-500 shadow-sm transition-colors flex items-center">
+                    <i class="fa-solid fa-check mr-2"></i> Import Selected
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-gray-800 shadow-2xl shadow-black/50 border border-gray-700 rounded-xl px-5 py-4 flex items-center space-x-4 transform translate-y-24 opacity-0 transition-all duration-300 z-[60]">
+        <div id="toastIcon" class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <div>
+            <p id="toastMessage" class="text-sm font-bold text-gray-100 shadow-sm whitespace-pre-line"></p>
+        </div>
+    </div>
+
+    <!-- Template for variants content generation (Hidden) -->
+    <template id="variantTemplate">
+        <div class="variant-entry border border-gray-700/50 rounded-xl bg-gray-950 p-4 space-y-4 relative group">
+            <button type="button" class="remove-variant-btn absolute top-3 right-3 text-gray-500 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 rounded-full w-7 h-7 flex items-center justify-center border border-gray-700 hover:border-rose-500/30">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+            
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Variant Name</label>
+                <input type="text" class="variant-name w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 text-gray-200 placeholder-gray-600 text-sm" placeholder="e.g. Python version, Main task, etc." required>
+            </div>
+
+            <!-- Dynamic field container based on category -->
+            <div class="variant-content-container">
+            </div>
+        </div>
+    </template>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
