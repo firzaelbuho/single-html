@@ -1,0 +1,101 @@
+:root {
+  --brand-ink: #0f172a;
+  --brand-red: #c2410c;
+  --brand-orange: #f97316;
+  --brand-line: rgba(148, 163, 184, 0.24);
+}
+
+body {
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(249, 115, 22, 0.16), transparent 30%),
+    radial-gradient(circle at top right, rgba(234, 88, 12, 0.14), transparent 24%),
+    linear-gradient(180deg, #fffaf5 0%, #fff 42%, #fff7ed 100%);
+  color: var(--brand-ink);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--brand-line);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.status-BOOKED,
+.status-PICKUP {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.status-TRANSIT,
+.status-MANIFEST,
+.status-ON_DELIVERY {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-OUT_FOR_DELIVERY {
+  background: #fef3c7;
+  color: #a16207;
+}
+
+.status-DELIVERED,
+.status-PAID,
+.status-READY {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-UNPAID,
+.status-FAILED_DELIVERY {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.data-table tbody tr {
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+.data-table tbody tr:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 247, 237, 0.8);
+}
+
+.nav-chip.active {
+  background: linear-gradient(135deg, var(--brand-red), var(--brand-orange));
+  color: #fff;
+  box-shadow: 0 16px 40px rgba(194, 65, 12, 0.26);
+}
+
+.rise-in {
+  animation: riseIn 500ms ease both;
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

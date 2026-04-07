@@ -1,0 +1,35 @@
+[
+  {
+    "customer_id": 1,
+    "customer_code": "CUST0001",
+    "customer_type": "INDIVIDU",
+    "full_name": "Budi Santoso",
+    "company_name": "",
+    "phone": "081234567890",
+    "email": "budi@example.com",
+    "city": "Jakarta Selatan",
+    "address": "Jl. Radio Dalam No. 5, Jakarta Selatan"
+  },
+  {
+    "customer_id": 2,
+    "customer_code": "CUST0002",
+    "customer_type": "PERUSAHAAN",
+    "full_name": "Siti Rahma",
+    "company_name": "PT Maju Logistik",
+    "phone": "082233445566",
+    "email": "shipping@majulogistik.co.id",
+    "city": "Bandung",
+    "address": "Jl. Soekarno Hatta No. 77, Bandung"
+  },
+  {
+    "customer_id": 3,
+    "customer_code": "CUST0003",
+    "customer_type": "INDIVIDU",
+    "full_name": "Agus Hidayat",
+    "company_name": "",
+    "phone": "081277788899",
+    "email": "agus.hidayat@example.com",
+    "city": "Semarang",
+    "address": "Jl. Durian Raya No. 15, Semarang"
+  }
+]

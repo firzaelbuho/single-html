@@ -29,6 +29,10 @@ const els = {
     newPromptBtn: document.getElementById('newPromptBtn'),
     exportBtn: document.getElementById('exportBtn'),
     importInput: document.getElementById('importInput'),
+    sidebar: document.getElementById('sidebar'),
+    sidebarBackdrop: document.getElementById('sidebarBackdrop'),
+    openSidebarBtn: document.getElementById('openSidebarBtn'),
+    closeSidebarBtn: document.getElementById('closeSidebarBtn'),
     
     modal: document.getElementById('promptModal'),
     modalTitle: document.getElementById('modalTitle'),
@@ -63,6 +67,20 @@ function init() {
     setupEventListeners();
     renderSidebar();
     renderPrompts();
+}
+
+function isMobileViewport() {
+    return window.innerWidth < 1024;
+}
+
+function openSidebar() {
+    els.sidebar.classList.add('show');
+    els.sidebarBackdrop.classList.add('show');
+}
+
+function closeSidebar() {
+    els.sidebar.classList.remove('show');
+    els.sidebarBackdrop.classList.remove('show');
 }
 
 function saveData() {
@@ -320,6 +338,7 @@ function renderSidebar() {
                 }
                 renderSidebar();
                 renderPrompts();
+                if (isMobileViewport()) closeSidebar();
             };
             els.tagList.appendChild(btn);
         });
@@ -383,9 +402,6 @@ function renderPrompts() {
                 </span>
                 
                 <div class="flex space-x-1 relative">
-                    <button class="w-7 h-7 rounded-md bg-transparent text-slate-400 hover:text-indigo-400 hover:bg-slate-700 flex items-center justify-center transition-colors action-edit" title="Edit">
-                        <i class="fa-solid fa-pen text-sm"></i>
-                    </button>
                     <button class="w-7 h-7 rounded-md bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-700 flex items-center justify-center transition-colors action-more" title="More Options">
                         <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
                     </button>
@@ -403,7 +419,7 @@ function renderPrompts() {
                 </div>
             </div>
             
-            <h3 class="font-bold text-white mb-2 truncate text-[15px] pr-4 tracking-tight" title="${prompt.title}">${prompt.title}</h3>
+            <h3 class="prompt-card-title font-bold text-white mb-2 text-[15px] pr-4 tracking-tight" title="${prompt.title}">${prompt.title}</h3>
             
             ${tabsHtml}
             
@@ -424,8 +440,23 @@ function renderPrompts() {
         
         let currentContent = prompt.content;
 
+        card.addEventListener('click', (e) => {
+            if (
+                e.target.closest('.prompt-checkbox-container') ||
+                e.target.closest('.action-more') ||
+                e.target.closest('.card-dropdown') ||
+                e.target.closest('.action-copy-area') ||
+                e.target.closest('.variant-tab')
+            ) {
+                return;
+            }
+            openModal(prompt.id);
+        });
+
+        card.querySelector('.prompt-checkbox').addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
         card.querySelector('.prompt-checkbox').addEventListener('change', () => toggleSelection(prompt.id));
-        card.querySelector('.action-edit').addEventListener('click', () => openModal(prompt.id));
         
         if (hasVariants) {
             const tabs = card.querySelectorAll('.variant-tab');
@@ -447,7 +478,8 @@ function renderPrompts() {
         }
 
         // Copy logic
-        card.querySelector('.action-copy-area').addEventListener('click', () => { 
+        card.querySelector('.action-copy-area').addEventListener('click', (e) => {
+            e.stopPropagation();
             navigator.clipboard.writeText(currentContent); 
             window.showToast('Copied to clipboard'); 
         });
@@ -639,6 +671,9 @@ function executeImport() {
 
 function setupEventListeners() {
     els.newPromptBtn.addEventListener('click', () => openModal());
+    els.openSidebarBtn.addEventListener('click', openSidebar);
+    els.closeSidebarBtn.addEventListener('click', closeSidebar);
+    els.sidebarBackdrop.addEventListener('click', closeSidebar);
     els.closeBtn.addEventListener('click', closeModal);
     els.cancelBtn.addEventListener('click', closeModal);
     els.saveBtn.addEventListener('click', savePrompt);
@@ -677,6 +712,7 @@ function setupEventListeners() {
             currentFilter.category = btn.dataset.category;
             renderSidebar();
             renderPrompts();
+            if (isMobileViewport()) closeSidebar();
         }
     });
 
@@ -699,6 +735,12 @@ function setupEventListeners() {
         if(e.target.checked) parsedImportData.forEach(p => importSelectedIds.add(p.id));
         else importSelectedIds.clear();
         updateImportModalUi();
+    });
+
+    window.addEventListener('resize', () => {
+        if (!isMobileViewport()) {
+            closeSidebar();
+        }
     });
 }
 

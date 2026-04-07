@@ -1,0 +1,26 @@
+[
+  {
+    "service_type_id": 1,
+    "service_code": "REG",
+    "service_name": "Regular Service",
+    "estimated_days": "2-4 hari",
+    "cod_available": true,
+    "insurance_available": true
+  },
+  {
+    "service_type_id": 2,
+    "service_code": "YES",
+    "service_name": "Yakin Esok Sampai",
+    "estimated_days": "1 hari",
+    "cod_available": true,
+    "insurance_available": true
+  },
+  {
+    "service_type_id": 3,
+    "service_code": "OKE",
+    "service_name": "Ongkos Kirim Ekonomis",
+    "estimated_days": "3-6 hari",
+    "cod_available": false,
+    "insurance_available": true
+  }
+]

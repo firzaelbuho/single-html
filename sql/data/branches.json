@@ -1,0 +1,35 @@
+[
+  {
+    "branch_id": 1,
+    "branch_code": "CGK01",
+    "branch_name": "Jakarta Selatan Gateway",
+    "branch_type": "PUSAT",
+    "city": "Jakarta Selatan",
+    "district": "Kebayoran Baru",
+    "phone": "0215551000",
+    "address": "Jl. Kyai Maja No. 10, Jakarta Selatan",
+    "is_active": true
+  },
+  {
+    "branch_id": 2,
+    "branch_code": "BDO01",
+    "branch_name": "Bandung Distribution Center",
+    "branch_type": "CABANG",
+    "city": "Bandung",
+    "district": "Lengkong",
+    "phone": "0225552000",
+    "address": "Jl. Asia Afrika No. 88, Bandung",
+    "is_active": true
+  },
+  {
+    "branch_id": 3,
+    "branch_code": "SRG01",
+    "branch_name": "Semarang Distribution Center",
+    "branch_type": "CABANG",
+    "city": "Semarang",
+    "district": "Tembalang",
+    "phone": "0245553000",
+    "address": "Jl. Setiabudi No. 21, Semarang",
+    "is_active": true
+  }
+]

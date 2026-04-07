@@ -10,32 +10,48 @@
 </head>
 
 <body>
-  <header>
-    <h1>JSON Tool</h1>
-    <p>Simplify large JSON payloads by reducing repetitive arrays</p>
-  </header>
-
-  <main class="container">
-    <div class="panel">
-      <div class="panel-header">
-        <h2>Input JSON</h2>
-        <button id="formatBtn" class="btn secondary">Format</button>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Utility Workspace</span>
+        <h1>JSON Tool</h1>
+        <p>Simplify large JSON payloads by reducing repetitive arrays with a cleaner, faster dark workspace.</p>
       </div>
-      <textarea id="jsonInput" placeholder="Paste your massive JSON here..."></textarea>
-    </div>
-
-    <div class="panel actions">
-      <button id="simplifyBtn" class="btn primary">Simplify &rarr;</button>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <h2>Simplified Output</h2>
-        <button id="copyBtn" class="btn secondary">Copy</button>
+      <div class="hero-note">
+        <span>Responsive</span>
+        <span>Dark Theme</span>
+        <span>Clipboard Ready</span>
       </div>
-      <textarea id="jsonOutput" readonly placeholder="Simplified structure will appear here..."></textarea>
-    </div>
-  </main>
+    </header>
+
+    <main class="container">
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Input JSON</h2>
+            <p>Paste or format raw payloads before simplifying.</p>
+          </div>
+          <button id="formatBtn" class="btn secondary">Format</button>
+        </div>
+        <textarea id="jsonInput" placeholder="Paste your massive JSON here..."></textarea>
+      </section>
+
+      <section class="panel actions">
+        <button id="simplifyBtn" class="btn primary">Simplify <span>&rarr;</span></button>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Simplified Output</h2>
+            <p>Copy the reduced structure once it's ready.</p>
+          </div>
+          <button id="copyBtn" class="btn secondary">Copy</button>
+        </div>
+        <textarea id="jsonOutput" readonly placeholder="Simplified structure will appear here..."></textarea>
+      </section>
+    </main>
+  </div>
 
   <script src="script.js"></script>
 </body>

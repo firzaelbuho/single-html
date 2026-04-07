@@ -1,0 +1,32 @@
+[
+  {
+    "payment_id": 1,
+    "payment_no": "PAY2604070001",
+    "tracking_no": "JNC2604070001",
+    "payment_method": "TRANSFER",
+    "payment_status": "PAID",
+    "amount_due": 28500,
+    "amount_paid": 28500,
+    "paid_at": "2026-04-07 09:10:00"
+  },
+  {
+    "payment_id": 2,
+    "payment_no": "PAY2604070002",
+    "tracking_no": "JNC2604070002",
+    "payment_method": "CASH",
+    "payment_status": "PAID",
+    "amount_due": 57000,
+    "amount_paid": 57000,
+    "paid_at": "2026-04-07 08:25:00"
+  },
+  {
+    "payment_id": 3,
+    "payment_no": "PAY2604070003",
+    "tracking_no": "JNC2604070003",
+    "payment_method": "COD",
+    "payment_status": "UNPAID",
+    "amount_due": 44500,
+    "amount_paid": 0,
+    "paid_at": null
+  }
+]

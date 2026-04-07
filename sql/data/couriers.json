@@ -1,0 +1,32 @@
+[
+  {
+    "employee_id": 2,
+    "employee_code": "EMP0002",
+    "full_name": "Rina Lestari",
+    "branch_code": "CGK01",
+    "branch_name": "Jakarta Selatan Gateway",
+    "phone": "081122223333",
+    "vehicle_type": "MOTOR",
+    "status": "ON_DELIVERY"
+  },
+  {
+    "employee_id": 3,
+    "employee_code": "EMP0003",
+    "full_name": "Dedi Kurniawan",
+    "branch_code": "BDO01",
+    "branch_name": "Bandung Distribution Center",
+    "phone": "081133334444",
+    "vehicle_type": "VAN",
+    "status": "READY"
+  },
+  {
+    "employee_id": 4,
+    "employee_code": "EMP0004",
+    "full_name": "Farhan Maulana",
+    "branch_code": "SRG01",
+    "branch_name": "Semarang Distribution Center",
+    "phone": "081244455566",
+    "vehicle_type": "MOTOR",
+    "status": "PICKUP"
+  }
+]
